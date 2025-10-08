@@ -5,3 +5,4 @@
 #     ◦ Husk at 3D CNNs utvider både det romlige og det temporale reseptive feltet gradvis
 
 #testetstst
+x=0
