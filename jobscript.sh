@@ -7,7 +7,7 @@
 #BSUB -gpu "num=1:mode=exclusive_process"
 
 ### -------- specify job name ------------------
-#BSUB -J simplejob
+#BSUB -J testrun_singleframe
 
 ### -------- specify number of cores -----------
 #BSUB -n 4
@@ -17,14 +17,15 @@
 #BSUB -R "rusage[mem=20GB]"
 
 ### -------- specify wall-clock time -----------
-#BSUB -W 00:30   # 30 minutter
+#BSUB -W 01:30   # 30 minutter
 
 ### -------- specify output/error files --------
-#BSUB -o output_%J.out
-#BSUB -e output_%J.err
+#BSUB -o logs/output_%J.out
+#BSUB -e logs/error_%J.err
+
 
 ### -------- execution environment -------------
 source ~/venv_1/bin/activate
 
 ### -------- run your script -------------------
-python main.py
+python -m src.main
