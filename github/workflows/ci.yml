@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  lint-and-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install ruff black
+      # Lint (fanger kodefeil, ubrukte imports, osv.)
+      - run: ruff check .
+      # Format-sjekk (sjekker at black er kjørt)
+      - run: black --check .
+   
