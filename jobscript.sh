@@ -28,4 +28,4 @@
 source ~/venv_1/bin/activate
 
 ### -------- run your script -------------------
-python -m src.smoke_tests
+python -m src.main
