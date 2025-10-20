@@ -8,15 +8,12 @@
 import sys
 import os
 import torch.nn as nn
+import torch.nn as nn
+from config import NUM_CLASSES
+from src.utils.model_factory import select_model
 
 # legg til prosjektroten i sys.path slik at config.py kan importeres
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
-import torch.nn as nn
-
-from config import NUM_CLASSES
-
-from src.utils.model_factory import select_model
 
 # #change model name here to test other models
 model = select_model("per_frame_agg", num_classes=NUM_CLASSES)

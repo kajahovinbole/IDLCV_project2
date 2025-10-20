@@ -7,13 +7,8 @@ from torch.utils.data import DataLoader
 from src.models.models import SingleFrameModel
 from src.utils.transforms import get_single_frame_transform
 from src.data.datasets import FrameImageDataset
-from config import DATA_ROOT, NUM_CLASSES   # <-- Hent fra config, ikke hardkod
+from config import DATA_ROOT, NUM_CLASSES, LR, NUM_WORKERS, BATCH_SIZE, EPOCHS   # <-- Hent fra config, ikke hardkod
 
-# --- KONFIG ---
-BATCH_SIZE = 64
-EPOCHS = 5
-LR = 1e-4
-NUM_WORKERS = 4
 
 def train_one_epoch(model, loader, opt, device):
     model.train()
