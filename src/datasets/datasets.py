@@ -1,4 +1,3 @@
-# src/data/datasets.py
 from glob import glob
 from pathlib import Path
 import os
@@ -6,7 +5,7 @@ import pandas as pd
 from PIL import Image
 import torch
 from torchvision import transforms as T
-from config import DATA_ROOT, N_FRAMES  # legg til i config.py
+from config import DATA_ROOT, N_FRAMES  
 
 class FrameImageDataset(torch.utils.data.Dataset):
     def __init__(self, root_dir=DATA_ROOT, split='train', transform=None):

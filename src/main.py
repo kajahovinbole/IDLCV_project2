@@ -1,29 +1,20 @@
-# to initialize the run
-# ◦ Parser kommandolinjeargumenter (eller laster inn config.yaml).
-# ◦ Velger riktig modell (f.eks. basert på et argument som model_name='LateFusion').
-# ◦ Initialiserer datasett og dataloadere ved hjelp av datasets.py.
-# ◦ Definerer tapfunksjon (f.eks. nn.CrossEntropyLoss) og optimalisator (f.eks. Adam eller SGD+Momentum).
-# ◦ Kaller treningsfunksjonen fra utils/training_loop.py.
-
-import sys
 import os
-import torch.nn as nn
-import torch.nn as nn
-from config import NUM_CLASSES
-from src.utils.model_factory import select_model
+import sys
+import torch
 
-# legg til prosjektroten i sys.path slik at config.py kan importeres
+# legg til prosjektroten i sys.path slik at src.* import fungerer
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-# #change model name here to test other models
-model = select_model("per_frame_agg", num_classes=NUM_CLASSES)
+from config import MODEL_NAME
+from src.utils.training_loop import main as train_frames
+# når du får early/late/3d kan du legge til flere:
+# from src.utils.video_training import main as train_videos
 
+if __name__ == "__main__":
+    model_name = MODEL_NAME if 'MODEL_NAME' in locals() else "per_frame_agg"
+    print(f"[INFO] Starter trening med modell: {model_name}")
 
-class VideoModel(nn.Module):
-    def __init__(self):
-        super(VideoModel, self).__init__()
-        # Modellarkitekturdefinisjon her
-
-    def forward(self, x):
-        # Fremoverpasseringslogikk her
-        return x
+    if model_name == "per_frame_agg":
+        train_frames(model_name=model_name)
+    else:
+        raise NotImplementedError(f"Treningsløype for {model_name} er ikke laget ennå.")

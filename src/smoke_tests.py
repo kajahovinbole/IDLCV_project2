@@ -1,8 +1,6 @@
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 import torch
-from src.data.datasets import FrameVideoDataset
+from src.datasets.datasets import FrameVideoDataset, FrameImageDataset
 from src.models.models import SingleFrameModel
 from src.utils.video_utils import logits_mean_over_time
 from src.utils.transforms import get_single_frame_transform
@@ -11,7 +9,8 @@ from config import DATA_ROOT, NUM_CLASSES, N_FRAMES
 def main():
     print(f"[INFO] Tester dataset fra {DATA_ROOT}")
     transform = get_single_frame_transform()
-    ds = FrameVideoDataset(root_dir=DATA_ROOT, split="train", transform=transform)
+    ds = FrameImageDataset(root_dir=DATA_ROOT, split="train", transform=transform)
+    #ds = FrameVideoDataset(root_dir=DATA_ROOT, split="train", transform=transform, stack_frames=True)
     print(f"Antall videoer i train: {len(ds)}")
 
     # hent én video
