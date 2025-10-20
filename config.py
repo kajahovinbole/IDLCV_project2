@@ -1,11 +1,11 @@
-import os
-
 NUM_CLASSES = 10
 TRAINABLE_BLOCKS = 0
 FREEZE_BACKBONE = True
-NUM_EPOCHS = 1
+EPOCHS = 1
 
-DATA_ROOT = os.path.expanduser("~/prosjekt_2/ufc10")  # sett riktig sti i config.py
+DATA_ROOT = "/dtu/datasets1/02516/ucf10"
+#DATA_ROOT = "/dtu/datasets1/02516/ucf101_noleakage"
 N_FRAMES = 10
 BATCH_SIZE = 64
 NUM_WORKERS = 8
+LR = 1e-4

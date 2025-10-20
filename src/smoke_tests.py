@@ -1,8 +1,8 @@
 import torch
-from src.data.datasets import FrameVideoDataset
-from src.models.models import SingleFrameModel
-from src.utils.video_utils import logits_mean_over_time
-from src.utils.transforms import get_single_frame_transform
+from data.datasets import FrameVideoDataset
+from models.models import SingleFrameModel
+from utils.video_utils import logits_mean_over_time
+from utils.transforms import get_single_frame_transform
 from config import DATA_ROOT, NUM_CLASSES, N_FRAMES
 
 def main():
