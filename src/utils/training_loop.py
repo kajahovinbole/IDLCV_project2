@@ -54,10 +54,20 @@ def main(model_name="per_frame_agg"):
     val_ds = FrameImageDataset(root_dir=DATA_ROOT, split="val", transform=tf)
 
     pin = torch.cuda.is_available()
-    train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True,
-                              num_workers=NUM_WORKERS, pin_memory=pin)
-    val_loader = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False,
-                            num_workers=NUM_WORKERS, pin_memory=pin)
+    train_loader = DataLoader(
+        train_ds,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
+        num_workers=NUM_WORKERS,
+        pin_memory=pin,
+    )
+    val_loader = DataLoader(
+        val_ds,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        num_workers=NUM_WORKERS,
+        pin_memory=pin,
+    )
 
     # Modell fra factory
     model = select_model(model_name, num_classes=NUM_CLASSES).to(device)
@@ -67,8 +77,10 @@ def main(model_name="per_frame_agg"):
     for e in range(1, EPOCHS + 1):
         tr_loss, tr_acc = train_one_epoch(model, train_loader, opt, device)
         va_loss, va_acc = evaluate_frames(model, val_loader, device)
-        print(f"Epoch {e:02d} | train {tr_acc:.3f} ({tr_loss:.4f}) | "
-              f"val {va_acc:.3f} ({va_loss:.4f})")
+        print(
+            f"Epoch {e:02d} | train {tr_acc:.3f} ({tr_loss:.4f}) | "
+            f"val {va_acc:.3f} ({va_loss:.4f})"
+        )
         best_va = max(best_va, va_acc)
 
     print(f"[INFO] Best val acc ({model_name}): {best_va:.3f}")

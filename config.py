@@ -1,6 +1,6 @@
 # datasett path
 DATA_ROOT = "/dtu/datasets1/02516/ufc10"
-#DATA_ROOT = "/dtu/datasets1/02516/ucf101_noleakage" #til senere oppagve
+# DATA_ROOT = "/dtu/datasets1/02516/ucf101_noleakage" #til senere oppagve
 
 # models
 MODEL_NAMES = ["per_frame_agg"]
