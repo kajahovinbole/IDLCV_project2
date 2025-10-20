@@ -1,4 +1,6 @@
-from src. models.models import SingleFrameModel  # , LateFusionModel, EarlyFusionModel, C3D
+from src.models.models import (
+    SingleFrameModel,
+)  # , LateFusionModel, EarlyFusionModel, C3D
 
 
 def select_model(model_name: str, num_classes: int):
