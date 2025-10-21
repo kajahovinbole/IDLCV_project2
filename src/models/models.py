@@ -232,7 +232,13 @@ class C3DModel(nn.Module):
             layers = []
             for i in range(n):
                 layers += [
-                    nn.Conv3d(cin if i == 0 else cout, cout, kernel_size=3, padding=1, bias=False),
+                    nn.Conv3d(
+                        cin if i == 0 else cout,
+                        cout,
+                        kernel_size=3,
+                        padding=1,
+                        bias=False,
+                    ),
                     nn.BatchNorm3d(cout),
                     nn.ReLU(inplace=True),
                 ]
@@ -240,20 +246,20 @@ class C3DModel(nn.Module):
 
         # C3D-lignende hierarki (tilpasset T=10)
         self.features = nn.Sequential(
-            conv_block(3,   64, n=1),
-            nn.MaxPool3d(kernel_size=(1, 2, 2), stride=(1, 2, 2)),  # Pool1: ingen tids-pool
-
-            conv_block(64,  128, n=1),
+            conv_block(3, 64, n=1),
+            nn.MaxPool3d(
+                kernel_size=(1, 2, 2), stride=(1, 2, 2)
+            ),  # Pool1: ingen tids-pool
+            conv_block(64, 128, n=1),
             nn.MaxPool3d(kernel_size=(2, 2, 2), stride=(2, 2, 2)),  # Pool2: tids-pool
-
             conv_block(128, 256, n=2),
             nn.MaxPool3d(kernel_size=(2, 2, 2), stride=(2, 2, 2)),  # Pool3: tids-pool
-
             conv_block(256, 512, n=2),
             nn.MaxPool3d(kernel_size=(2, 2, 2), stride=(2, 2, 2)),  # Pool4: tids-pool
-
             conv_block(512, 512, n=2),
-            nn.MaxPool3d(kernel_size=(1, 2, 2), stride=(1, 2, 2)),  # Pool5: ingen tids-pool (T forblir >=1)
+            nn.MaxPool3d(
+                kernel_size=(1, 2, 2), stride=(1, 2, 2)
+            ),  # Pool5: ingen tids-pool (T forblir >=1)
         )
 
         self.global_pool = nn.AdaptiveAvgPool3d((1, 1, 1))  # [B,512,1,1,1]
@@ -268,8 +274,8 @@ class C3DModel(nn.Module):
         if isinstance(x, (list, tuple)):
             assert len(x) > 0, "Tom videoliste"
             B, C, H, W = x[0].shape
-            x_btc_hw = torch.stack(x, dim=1)           # [B,T,C,H,W]
-            x_bct_hw = x_btc_hw.permute(0, 2, 1, 3, 4) # [B,C,T,H,W]
+            x_btc_hw = torch.stack(x, dim=1)  # [B,T,C,H,W]
+            x_bct_hw = x_btc_hw.permute(0, 2, 1, 3, 4)  # [B,C,T,H,W]
             return x_bct_hw
         else:
             assert x.dim() == 5, f"Forventet [B,C,T,H,W], fikk {tuple(x.shape)}"
@@ -277,8 +283,8 @@ class C3DModel(nn.Module):
 
     # ---- forward ----
     def forward(self, x):
-        x = self._to_BCTHW(x)                 # [B,C,T,H,W]
-        feats = self.features(x)              # [B,512,t',h',w']
+        x = self._to_BCTHW(x)  # [B,C,T,H,W]
+        feats = self.features(x)  # [B,512,t',h',w']
         pooled = self.global_pool(feats).flatten(1)  # [B,512]
-        logits = self.head(pooled)            # [B,K]
+        logits = self.head(pooled)  # [B,K]
         return logits
