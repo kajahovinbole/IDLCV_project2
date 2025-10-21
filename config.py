@@ -5,8 +5,7 @@ DATA_ROOT = "/dtu/datasets1/02516/ufc10"
 # DATA_ROOT = "/dtu/datasets1/02516/ucf101_noleakage" #til senere oppagve
 
 # models
-MODEL_NAMES = ["per_frame", "late_fusion", "early_fusion"]
-# MODEL_NAMES = ["per_frame_agg", "early_fusion", "late_fusion", "c3d"]
+MODEL_NAMES = ["per_frame", "late_fusion", "early_fusion", "3d_cnn"]
 
 # antall klasser i datasettet
 NUM_CLASSES = 10

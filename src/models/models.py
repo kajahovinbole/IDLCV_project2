@@ -213,3 +213,78 @@ class EarlyFusionModel(nn.Module):
         feats = self.backbone(x_bct_hw)  # [B, F]
         logits = self.head(feats)  # [B, K]
         return logits
+
+
+class C3DModel(nn.Module):
+    """
+    C3D-aktig 3D-CNN for video-klassifisering.
+    - Inndata: [B,C,T,H,W] eller list[T x [B,C,H,W]]
+    - Arkitektur: 3x3x3 Conv + 2x2x2 Pool, men:
+        * Pool1 = (1,2,2)   (ingen tids-pooling i første)
+        * Pool5 = (1,2,2)   (robust for T=10 slik at T ikke blir 0)
+    - Global AdaptiveAvgPool3d -> liten head [512 -> num_classes]
+    """
+
+    def __init__(self, num_classes: int, dropout_p: float = 0.3):
+        super().__init__()
+
+        def conv_block(cin, cout, n=1):
+            layers = []
+            for i in range(n):
+                layers += [
+                    nn.Conv3d(
+                        cin if i == 0 else cout,
+                        cout,
+                        kernel_size=3,
+                        padding=1,
+                        bias=False,
+                    ),
+                    nn.BatchNorm3d(cout),
+                    nn.ReLU(inplace=True),
+                ]
+            return nn.Sequential(*layers)
+
+        # C3D-lignende hierarki (tilpasset T=10)
+        self.features = nn.Sequential(
+            conv_block(3, 64, n=1),
+            nn.MaxPool3d(
+                kernel_size=(1, 2, 2), stride=(1, 2, 2)
+            ),  # Pool1: ingen tids-pool
+            conv_block(64, 128, n=1),
+            nn.MaxPool3d(kernel_size=(2, 2, 2), stride=(2, 2, 2)),  # Pool2: tids-pool
+            conv_block(128, 256, n=2),
+            nn.MaxPool3d(kernel_size=(2, 2, 2), stride=(2, 2, 2)),  # Pool3: tids-pool
+            conv_block(256, 512, n=2),
+            nn.MaxPool3d(kernel_size=(2, 2, 2), stride=(2, 2, 2)),  # Pool4: tids-pool
+            conv_block(512, 512, n=2),
+            nn.MaxPool3d(
+                kernel_size=(1, 2, 2), stride=(1, 2, 2)
+            ),  # Pool5: ingen tids-pool (T forblir >=1)
+        )
+
+        self.global_pool = nn.AdaptiveAvgPool3d((1, 1, 1))  # [B,512,1,1,1]
+        self.head = nn.Sequential(
+            nn.Dropout(dropout_p),
+            nn.Linear(512, num_classes),
+        )
+
+    # ---- helpers ----
+    def _to_BCTHW(self, x):
+        """Sørger for [B,C,T,H,W] uansett om x er liste eller tensor."""
+        if isinstance(x, (list, tuple)):
+            assert len(x) > 0, "Tom videoliste"
+            B, C, H, W = x[0].shape
+            x_btc_hw = torch.stack(x, dim=1)  # [B,T,C,H,W]
+            x_bct_hw = x_btc_hw.permute(0, 2, 1, 3, 4)  # [B,C,T,H,W]
+            return x_bct_hw
+        else:
+            assert x.dim() == 5, f"Forventet [B,C,T,H,W], fikk {tuple(x.shape)}"
+            return x
+
+    # ---- forward ----
+    def forward(self, x):
+        x = self._to_BCTHW(x)  # [B,C,T,H,W]
+        feats = self.features(x)  # [B,512,t',h',w']
+        pooled = self.global_pool(feats).flatten(1)  # [B,512]
+        logits = self.head(pooled)  # [B,K]
+        return logits
