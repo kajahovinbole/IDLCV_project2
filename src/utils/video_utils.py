@@ -1,7 +1,8 @@
 # src/utils/video_utils.py
 import torch
 
-#kun for smoke_test, kan slette denne etterhvert
+# kun for smoke_test, kan slette denne etterhvert
+
 
 @torch.no_grad()
 def logits_mean_over_time(model, x, *, batch_size: int = 16):

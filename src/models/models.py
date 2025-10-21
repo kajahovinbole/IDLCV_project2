@@ -105,6 +105,7 @@ class LateFusionModel(nn.Module):
         logits_bt = logits_bt.view(B, T, -1)  # [B, T, K]
         return logits_bt.mean(dim=1)  # late fusion (avg) -> [B, K]
 
+
 class EarlyFusionModel(nn.Module):
     """
     Early fusion for video:
@@ -150,8 +151,8 @@ class EarlyFusionModel(nn.Module):
             # x[t]: [B,C,H,W] — stack til [B,T,C,H,W] -> [B,C,T,H,W]
             B, C, H, W = x[0].shape
             T = len(x)
-            x_btc_hw = torch.stack(x, dim=1)           # [B,T,C,H,W]
-            x_bct_hw = x_btc_hw.permute(0, 2, 1, 3, 4) # [B,C,T,H,W]
+            x_btc_hw = torch.stack(x, dim=1)  # [B,T,C,H,W]
+            x_bct_hw = x_btc_hw.permute(0, 2, 1, 3, 4)  # [B,C,T,H,W]
             return x_bct_hw, (B, C, T, H, W)
         else:
             # Forventet [B,C,T,H,W]
@@ -201,14 +202,14 @@ class EarlyFusionModel(nn.Module):
         x: [B,C,T,H,W] eller list[T x [B,C,H,W]]
         Returnerer: [B, num_classes]
         """
-        x, (B, C, T, H, W) = self._to_BCTHW(x)           # [B,C,T,H,W]
+        x, (B, C, T, H, W) = self._to_BCTHW(x)  # [B,C,T,H,W]
         self._ensure_conv1_in_channels(T, x.device, x.dtype)
 
         # Early fusion: kanal-konkatenasjon
         x_bct_hw = x
         x_bct_hw = x_bct_hw.contiguous()
-        x_bct_hw = x_bct_hw.view(B, C * T, H, W)         # [B, C*T, H, W]
+        x_bct_hw = x_bct_hw.view(B, C * T, H, W)  # [B, C*T, H, W]
 
-        feats = self.backbone(x_bct_hw)                  # [B, F]
-        logits = self.head(feats)                        # [B, K]
-        return logits  
+        feats = self.backbone(x_bct_hw)  # [B, F]
+        logits = self.head(feats)  # [B, K]
+        return logits

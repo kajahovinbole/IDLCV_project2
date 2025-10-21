@@ -1,8 +1,4 @@
-from src.models.models import (
-    SingleFrameModel,
-    LateFusionModel,
-    EarlyFusionModel
-)  
+from src.models.models import SingleFrameModel, LateFusionModel, EarlyFusionModel
 
 
 def select_model(model_name: str, num_classes: int):
@@ -14,7 +10,7 @@ def select_model(model_name: str, num_classes: int):
 
     elif model_name == "late_fusion":
         return LateFusionModel(num_classes)
-    elif model_name == 'early_fusion':
+    elif model_name == "early_fusion":
         return EarlyFusionModel(num_classes)
     #     return EarlyFusionModel(num_classes)
     # elif model_name == 'c3d':
