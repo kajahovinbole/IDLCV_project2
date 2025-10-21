@@ -1,4 +1,5 @@
-import random, numpy as np
+import random
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
@@ -16,11 +17,13 @@ def set_seed(seed: int = SEED):
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
 
+
 # --- Device helper (trengs om x kan være liste) ---
 def _move_to_device(x, device):
     if isinstance(x, (list, tuple)):
         return [f.to(device, non_blocking=True) for f in x]
     return x.to(device, non_blocking=True)
+
 
 # --- Train/Eval ---
 def train_one_epoch(model, loader, opt, device):
@@ -44,6 +47,7 @@ def train_one_epoch(model, loader, opt, device):
         loss_sum += loss.item() * y.size(0)
     return loss_sum / total, correct / total
 
+
 @torch.no_grad()
 def evaluate_frames(model, loader, device):
     model.eval()
@@ -62,6 +66,7 @@ def evaluate_frames(model, loader, device):
         loss_sum += loss.item() * y.size(0)
     return loss_sum / total, correct / total
 
+
 # --- Dataloaders valgt ut fra modellnavn ---
 def make_datasets_and_loaders(model_name, tf, device):
     name = model_name.lower()
@@ -69,23 +74,30 @@ def make_datasets_and_loaders(model_name, tf, device):
 
     if name in ("late_fusion", "late-fusion"):
         # Video-datasett (bruk stack_frames=True for enkelhets skyld)
-        train_ds = FrameVideoDataset(DATA_ROOT, split="train", transform=tf, stack_frames=True)
-        val_ds   = FrameVideoDataset(DATA_ROOT, split="val",   transform=tf, stack_frames=True)
+        train_ds = FrameVideoDataset(
+            DATA_ROOT, split="train", transform=tf, stack_frames=True
+        )
+        val_ds = FrameVideoDataset(
+            DATA_ROOT, split="val", transform=tf, stack_frames=True
+        )
         bs = max(1, BATCH_SIZE // 4)  # video er tyngre
     else:
         # Single frame
         train_ds = FrameImageDataset(DATA_ROOT, split="train", transform=tf)
-        val_ds   = FrameImageDataset(DATA_ROOT, split="val",   transform=tf)
+        val_ds = FrameImageDataset(DATA_ROOT, split="val", transform=tf)
         bs = BATCH_SIZE
 
-    train_loader = DataLoader(train_ds, batch_size=bs, shuffle=True,
-                              num_workers=NUM_WORKERS, pin_memory=pin)
-    val_loader   = DataLoader(val_ds,  batch_size=bs, shuffle=False,
-                              num_workers=NUM_WORKERS, pin_memory=pin)
+    train_loader = DataLoader(
+        train_ds, batch_size=bs, shuffle=True, num_workers=NUM_WORKERS, pin_memory=pin
+    )
+    val_loader = DataLoader(
+        val_ds, batch_size=bs, shuffle=False, num_workers=NUM_WORKERS, pin_memory=pin
+    )
     return train_loader, val_loader
 
+
 # --- Main ---
-def main(model_name="per_frame_agg"):
+def main(model_name):
     set_seed(SEED)  # viktig: før datasett/modell/opt
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"[INFO] Device: {device}")
@@ -100,9 +112,10 @@ def main(model_name="per_frame_agg"):
     for e in range(1, EPOCHS + 1):
         tr_loss, tr_acc = train_one_epoch(model, train_loader, opt, device)
         va_loss, va_acc = evaluate_frames(model, val_loader, device)
-        print(f"Epoch {e:02d} | train {tr_acc:.3f} ({tr_loss:.4f}) | "
-              f"val {va_acc:.3f} ({va_loss:.4f})")
+        print(
+            f"Epoch {e:02d} | train {tr_acc:.3f} ({tr_loss:.4f}) | "
+            f"val {va_acc:.3f} ({va_loss:.4f})"
+        )
         best_va = max(best_va, va_acc)
 
     print(f"[INFO] Best val acc ({model_name}): {best_va:.3f}")
-

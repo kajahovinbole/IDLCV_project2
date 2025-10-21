@@ -38,8 +38,6 @@ class SingleFrameModel(nn.Module):
         return self.head(f)  # [B, num_classes]
 
 
-
-
 class LateFusionModel(nn.Module):
     """
     Late fusion for video:
@@ -85,7 +83,9 @@ class LateFusionModel(nn.Module):
             assert len(x) > 0, "Tom sekvens av frames"
             T = len(x)
             B, C, H, W = x[0].shape
-            x_bt = torch.stack(x, dim=1).reshape(B * T, C, H, W)  # [B,T,C,H,W] -> [B*T,C,H,W]
+            x_bt = torch.stack(x, dim=1).reshape(
+                B * T, C, H, W
+            )  # [B,T,C,H,W] -> [B*T,C,H,W]
             return x_bt, B, T
         else:
             # stacket [B,C,T,H,W] -> [B*T,C,H,W]
@@ -98,8 +98,8 @@ class LateFusionModel(nn.Module):
         """
         Returnerer video-logits [B, num_classes].
         """
-        x_bt, B, T = self._to_BTCHW(x)          # [B*T,C,H,W]
-        feats_bt = self.backbone(x_bt)          # [B*T, F]
-        logits_bt = self.head(feats_bt)         # [B*T, K]
-        logits_bt = logits_bt.view(B, T, -1)    # [B, T, K]
-        return logits_bt.mean(dim=1)            # late fusion (avg) -> [B, K]
+        x_bt, B, T = self._to_BTCHW(x)  # [B*T,C,H,W]
+        feats_bt = self.backbone(x_bt)  # [B*T, F]
+        logits_bt = self.head(feats_bt)  # [B*T, K]
+        logits_bt = logits_bt.view(B, T, -1)  # [B, T, K]
+        return logits_bt.mean(dim=1)  # late fusion (avg) -> [B, K]

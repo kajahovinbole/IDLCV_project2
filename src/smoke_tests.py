@@ -10,7 +10,7 @@ def main():
     print(f"[INFO] Tester dataset fra {DATA_ROOT}")
     transform = get_single_frame_transform()
     ds = FrameImageDataset(root_dir=DATA_ROOT, split="train", transform=transform)
-    # ds = FrameVideoDataset(root_dir=DATA_ROOT, split="train", transform=transform, stack_frames=True)
+    # ds = FrameVideoDataset(root_dir=DATA_ROOT, split="train", transform=transform, stack_frames=False)
     print(f"Antall videoer i train: {len(ds)}")
 
     # hent én video
@@ -20,6 +20,7 @@ def main():
 
     # initier modell
     model = SingleFrameModel(num_classes=NUM_CLASSES)
+    # model = LateFusionModel(num_classes=NUM_CLASSES, freeze_backbone=True)
     model.eval()
 
     # kjør forward-pass (enten med stackede frames eller liste)

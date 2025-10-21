@@ -1,14 +1,17 @@
-from src.models.models import SingleFrameModel, LateFusionModel  # , LateFusionModel, EarlyFusionModel, C3D
+from src.models.models import (
+    SingleFrameModel,
+    LateFusionModel,
+)  # , LateFusionModel, EarlyFusionModel, C3D
 
 
 def select_model(model_name: str, num_classes: int):
     """
     Velger og instansierer den korrekte modellen basert på navn.
     """
-    if model_name == "per_frame_agg":
+    if model_name == "per_frame":
         return SingleFrameModel(num_classes)
 
-    elif model_name == 'late_fusion':
+    elif model_name == "late_fusion":
         return LateFusionModel(num_classes)
     # elif model_name == 'early_fusion':
     #     # Instansier Early Fusion klassen
