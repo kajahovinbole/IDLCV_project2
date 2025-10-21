@@ -72,7 +72,7 @@ def make_datasets_and_loaders(model_name, tf, device):
     name = model_name.lower()
     pin = device.type == "cuda"
 
-    if name in ("late_fusion", "late-fusion", "early_fusion", "early-fusion"):
+    if name in ("late_fusion", "early_fusion", "3d_cnn"):
         # Early/Late fusion trenger [B,C,T,H,W] (eller liste av T frames)
         train_ds = FrameVideoDataset(
             DATA_ROOT, split="train", transform=tf, stack_frames=True
