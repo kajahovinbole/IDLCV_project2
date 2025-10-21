@@ -72,19 +72,15 @@ def make_datasets_and_loaders(model_name, tf, device):
     name = model_name.lower()
     pin = device.type == "cuda"
 
-    if name in ("late_fusion", "late-fusion"):
-        # Video-datasett (bruk stack_frames=True for enkelhets skyld)
-        train_ds = FrameVideoDataset(
-            DATA_ROOT, split="train", transform=tf, stack_frames=True
-        )
-        val_ds = FrameVideoDataset(
-            DATA_ROOT, split="val", transform=tf, stack_frames=True
-        )
-        bs = max(1, BATCH_SIZE // 4)  # video er tyngre
+    if name in ("late_fusion", "late-fusion", "early_fusion", "early-fusion"):
+        # Early/Late fusion trenger [B,C,T,H,W] (eller liste av T frames)
+        train_ds = FrameVideoDataset(DATA_ROOT, split="train", transform=tf, stack_frames=True)
+        val_ds   = FrameVideoDataset(DATA_ROOT, split="val",   transform=tf, stack_frames=True)
+        # Early fusion er tyngre (C*T inn i conv1) → senk batchstørrelse litt
+        bs = max(1, BATCH_SIZE // 4)
     else:
-        # Single frame
         train_ds = FrameImageDataset(DATA_ROOT, split="train", transform=tf)
-        val_ds = FrameImageDataset(DATA_ROOT, split="val", transform=tf)
+        val_ds   = FrameImageDataset(DATA_ROOT, split="val",   transform=tf)
         bs = BATCH_SIZE
 
     train_loader = DataLoader(
