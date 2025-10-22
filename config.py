@@ -2,7 +2,7 @@ SEED = 42
 
 # datasett path
 # DATA_ROOT = "/dtu/datasets1/02516/ufc10"
-DATA_ROOT = "/dtu/datasets1/02516/ucf101_noleakage" 
+DATA_ROOT = "/dtu/datasets1/02516/ucf101_noleakage"
 
 # models
 MODEL_NAMES = ["per_frame", "late_fusion", "early_fusion", "3d_cnn"]

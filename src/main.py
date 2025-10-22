@@ -3,7 +3,6 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from config import MODEL_NAMES
 from src.utils.training_loop import main as train_one_model
 
 if __name__ == "__main__":
