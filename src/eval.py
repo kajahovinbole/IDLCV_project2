@@ -108,5 +108,8 @@ def main(models):
     print(f"\n[INFO] Ferdig! Resultater lagret i {outdir}")
 
 
+# if __name__ == "__main__":
+#     main(MODEL_NAMES)
+
 if __name__ == "__main__":
-    main(MODEL_NAMES)
+    main(["per_frame"])
