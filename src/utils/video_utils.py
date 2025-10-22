@@ -3,7 +3,7 @@ import torch
 
 # kun for smoke_test, kan slette denne etterhvert
 
-
+x=2
 @torch.no_grad()
 def logits_mean_over_time(model, x, *, batch_size: int = 16):
     """
