@@ -189,19 +189,50 @@ def plot_confusion_matrix(result, outdir=OUT_DIR):
 
 
 # -------------------- MAIN --------------------
+# bruk denne for å teste for flere modeller samtidig
+# if __name__ == "__main__":
+#     # treningskurver
+#     latest = find_latest_out_file()
+#     models = parse_models_from_log(latest)
+#     plot_curves(models)
+
+#     # eval plots
+#     eval_results = load_eval_results()
+#     plot_eval_summary(eval_results)
+#     plot_per_class_accuracy(eval_results)
+
+#     # 🔹 Lag confusion matrix for alle modeller
+#     for r in eval_results:
+#         if "confusion_matrix" in r:
+#             plot_confusion_matrix(r)
+#     print(f"[INFO] Ferdig – figurer lagret i {OUT_DIR}")
+
+
+# bruk denne for å teste for én modell av gangen (TARGET_MODEL)
 if __name__ == "__main__":
+    TARGET_MODEL = "per_frame_agg"  # <-- skriv inn navnet på modellen du trente
+
     # treningskurver
     latest = find_latest_out_file()
     models = parse_models_from_log(latest)
+    if TARGET_MODEL in models:
+        models = {TARGET_MODEL: models[TARGET_MODEL]}
+    else:
+        print(f"[WARN] Fant ikke {TARGET_MODEL} i loggfilen – plotter alle modeller.")
+
     plot_curves(models)
 
     # eval plots
     eval_results = load_eval_results()
-    plot_eval_summary(eval_results)
-    plot_per_class_accuracy(eval_results)
+    eval_results = [r for r in eval_results if r["model"] == TARGET_MODEL]
 
-    # 🔹 Lag confusion matrix for alle modeller
-    for r in eval_results:
-        if "confusion_matrix" in r:
-            plot_confusion_matrix(r)
+    if not eval_results:
+        print(f"[WARN] Ingen eval-resultater for {TARGET_MODEL}")
+    else:
+        plot_eval_summary(eval_results)
+        plot_per_class_accuracy(eval_results)
+        for r in eval_results:
+            if "confusion_matrix" in r:
+                plot_confusion_matrix(r)
+
     print(f"[INFO] Ferdig – figurer lagret i {OUT_DIR}")

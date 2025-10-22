@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 # prosjekt-importer
-from config import DATA_ROOT, NUM_CLASSES, BATCH_SIZE, NUM_WORKERS, MODEL_NAMES
+from config import DATA_ROOT, NUM_CLASSES, BATCH_SIZE, NUM_WORKERS
 from src.utils.transforms import get_single_frame_transform
 from src.datasets.datasets import FrameImageDataset, FrameVideoDataset
 from src.utils.model_factory import select_model
@@ -108,5 +108,8 @@ def main(models):
     print(f"\n[INFO] Ferdig! Resultater lagret i {outdir}")
 
 
+# if __name__ == "__main__":
+#     main(MODEL_NAMES)
+
 if __name__ == "__main__":
-    main(MODEL_NAMES)
+    main(["per_frame"])
