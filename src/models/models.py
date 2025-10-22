@@ -12,8 +12,9 @@ class SingleFrameModel(nn.Module):
     def __init__(
         self,
         num_classes: int,
-        freeze_backbone: bool = True,
-        trainable_blocks: int = 0,  # 0: frys alt, 1: unfreeze layer4, 2: layer3+4
+        dropout_p: float,
+        freeze_backbone: bool,
+        trainable_blocks: int,  # 0: frys alt, 1: unfreeze layer4, 2: layer3+4
         weights=ResNet50_Weights.IMAGENET1K_V1,
     ):
         super().__init__()
@@ -25,11 +26,13 @@ class SingleFrameModel(nn.Module):
         for p in m.parameters():
             p.requires_grad = not freeze_backbone
 
-        # ev. tine opp siste blokker
-        # if freeze_backbone and trainable_blocks >= 1:
-        #     for p in m.layer4.parameters(): p.requires_grad = True
-        # if freeze_backbone and trainable_blocks >= 2:
-        #     for p in m.layer3.parameters(): p.requires_grad = True
+        # unfreeze noen blokker om ønsket
+        if freeze_backbone and trainable_blocks >= 1:
+            for p in m.layer4.parameters():
+                p.requires_grad = True
+        if freeze_backbone and trainable_blocks >= 2:
+            for p in m.layer3.parameters():
+                p.requires_grad = True
 
         self.backbone = m
         self.head = nn.Sequential(nn.Dropout(0.3), nn.Linear(feat_dim, num_classes))
@@ -54,8 +57,8 @@ class LateFusionModel(nn.Module):
     def __init__(
         self,
         num_classes: int,
-        freeze_backbone: bool = True,
-        dropout_p: float = 0.3,
+        freeze_backbone: bool,
+        dropout_p: float,
         weights=ResNet50_Weights.IMAGENET1K_V1,
     ):
         super().__init__()
@@ -124,8 +127,8 @@ class EarlyFusionModel(nn.Module):
     def __init__(
         self,
         num_classes: int,
-        freeze_backbone: bool = True,
-        dropout_p: float = 0.3,
+        freeze_backbone: bool,
+        dropout_p: float,
         weights=ResNet50_Weights.IMAGENET1K_V1,
     ):
         super().__init__()
@@ -225,7 +228,7 @@ class C3DModel(nn.Module):
     - Global AdaptiveAvgPool3d -> liten head [512 -> num_classes]
     """
 
-    def __init__(self, num_classes: int, dropout_p: float = 0.3):
+    def __init__(self, num_classes: int, dropout_p: float):
         super().__init__()
 
         def conv_block(cin, cout, n=1):
