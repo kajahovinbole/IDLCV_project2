@@ -17,7 +17,7 @@
 #BSUB -R "rusage[mem=20GB]"
 
 ### -------- specify wall-clock time -----------
-#BSUB -W 01:30   # 30 minutter
+#BSUB -W 02:00
 
 ### -------- specify output/error files --------
 #BSUB -o logs/output_%J.out
